@@ -46,4 +46,19 @@ def check_mass_flow_balance(
 
     calculated_total = oxidiser_flow + fuel_flow
 
-    return abs(calculated_total - total_mass_flow) <= tolerance
+    return abs(calculated_total - total_mass_flow) <= tolerance 
+
+
+def calculate_propellant_mass(
+    total_mass_flow: float,
+    burn_time: float,
+) -> float:
+    """Calculate total propellant mass consumed during the burn."""
+
+    if total_mass_flow <= 0:
+        raise ValueError("Total mass flow must be positive.")
+
+    if burn_time <= 0:
+        raise ValueError("Burn time must be positive.")
+
+    return total_mass_flow * burn_time

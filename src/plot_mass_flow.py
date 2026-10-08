@@ -3,21 +3,34 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 
+from .config import EngineCase
 from .performance import (
+    calculate_propellant_mass,
     calculate_total_mass_flow,
     split_propellant_mass_flow,
 )
 
-
 def main() -> None:
-    thrust = 100_000.0
-    specific_impulse = 350.0
+    case = EngineCase()
     mixture_ratios = np.linspace(1.5, 5.0, 100)
 
     total_flow = calculate_total_mass_flow(
-        thrust=thrust,
-        specific_impulse=specific_impulse,
+    thrust=case.thrust,
+    specific_impulse=case.specific_impulse,
+)
+
+    total_propellant_mass = calculate_propellant_mass(
+    total_mass_flow=total_flow,
+    burn_time=case.burn_time,
+)
+
+
+    print(f"Total mass flow: {total_flow:.3f} kg/s")
+    print(
+        f"Total propellant mass for {case.burn_time:.1f} s: "
+        f"{total_propellant_mass:.3f} kg"
     )
+
 
     results_dir = Path("results")
     results_dir.mkdir(parents=True, exist_ok=True)
@@ -77,3 +90,20 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
+
+from .config import EngineCase
+
+from pathlib import Path
+
+import matplotlib.pyplot as plt
+import numpy as np
+
+
+from .config import EngineCase
+from .performance import (
+    calculate_total_mass_flow,
+    split_propellant_mass_flow,
+    calculate_propellant_mass,
+)
+
