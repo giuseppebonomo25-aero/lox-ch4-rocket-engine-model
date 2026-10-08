@@ -1,0 +1,37 @@
+from .costants import G0
+
+def calculate_total_mass_flow(
+        thrust: float,
+        specific_impulse: float,
+) -> float:
+    """Calculate total propellant mass flow rate."""
+
+    if thrust <= 0:
+        raise ValueError("Thrust must be positive.")
+
+    if specific_impulse <=0:
+        raise ValueError("Specific impulse must be positive")
+
+    return thrust / (specific_impulse * G0)
+
+def split_propellant_mass_flow(
+        total_mass_flow: float,
+        oxidizer_to_fuel_ratio: float,
+) -> tuple[float, float]:
+    """Split total mass flow into oxidizer and fuel mass flow."""
+
+    if total_mass_flow <=0:
+        raise ValueError("Total mass flow must be positive.")
+
+    if oxidizer_to_fuel_ratio <=0:
+        raise ValueError("Oxidizer-to-fuel ratio must be positive.")
+
+    oxidizer_flow = (
+        total_mass_flow
+        * oxidizer_to_fuel_ratio
+        /(1+ oxidizer_to_fuel_ratio)
+    )
+
+    fuel_flow = total_mass_flow / (1+oxidizer_to_fuel_ratio)
+
+    return oxidizer_flow, fuel_flow
