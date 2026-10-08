@@ -2,6 +2,7 @@ import pytest
 
 from src.performance import (
     calculate_total_mass_flow,
+    check_mass_flow_balance,
     split_propellant_mass_flow,
 )
 
@@ -44,3 +45,18 @@ def test_invalid_mixture_ratio():
             total_mass_flow=29.132,
             oxidizer_to_fuel_ratio=0.0,
         )
+
+def test_mass_flow_balance():
+    total_flow = 29.132
+
+    lox_flow, methane_flow = split_propellant_mass_flow(
+        total_mass_flow=total_flow,
+        oxidizer_to_fuel_ratio=3.5,
+    )
+
+    assert check_mass_flow_balance(
+        total_mass_flow=total_flow,
+        oxidiser_flow=lox_flow,
+        fuel_flow=methane_flow,
+
+    )

@@ -35,3 +35,15 @@ def split_propellant_mass_flow(
     fuel_flow = total_mass_flow / (1+oxidizer_to_fuel_ratio)
 
     return oxidizer_flow, fuel_flow
+
+def check_mass_flow_balance(
+    total_mass_flow: float,
+    oxidiser_flow: float,
+    fuel_flow: float,
+    tolerance: float = 1e-10,
+) -> bool:
+    """Check conservation of total propellant mass flow."""
+
+    calculated_total = oxidiser_flow + fuel_flow
+
+    return abs(calculated_total - total_mass_flow) <= tolerance

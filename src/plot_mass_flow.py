@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -17,6 +19,9 @@ def main() -> None:
         specific_impulse=specific_impulse,
     )
 
+    results_dir = Path("results")
+    results_dir.mkdir(parents=True, exist_ok=True)
+
     lox_flows = []
     methane_flows = []
 
@@ -29,6 +34,30 @@ def main() -> None:
         lox_flows.append(lox_flow)
         methane_flows.append(methane_flow)
 
+    table_ratios = [2.0, 3.0, 3.5, 4.0, 5.0]
+
+    table_lines = [
+        "O/F,Total flow [kg/s],LOX flow [kg/s],CH4 flow [kg/s]"
+    ]
+
+    for mixture_ratio in table_ratios:
+        lox_flow, methane_flow = split_propellant_mass_flow(
+            total_mass_flow=total_flow,
+            oxidizer_to_fuel_ratio=mixture_ratio,
+        )
+
+        table_lines.append(
+            f"{mixture_ratio:.2f},"
+            f"{total_flow:.6f},"
+            f"{lox_flow:.6f},"
+            f"{methane_flow:.6f}"
+        )
+
+    (results_dir / "mass_flow_table.csv").write_text(
+        "\n".join(table_lines) + "\n",
+        encoding="utf-8",
+    )
+
     plt.figure(figsize=(8, 5))
     plt.plot(mixture_ratios, lox_flows, label="LOX")
     plt.plot(mixture_ratios, methane_flows, label="CH4")
@@ -39,7 +68,10 @@ def main() -> None:
     plt.grid(True)
     plt.legend()
     plt.tight_layout()
-    plt.savefig("results/propellant_mass_flow_split.png", dpi=300)
+    plt.savefig(
+        results_dir / "propellant_mass_flow_split.png",
+        dpi=300,
+    )
     plt.show()
 
 
