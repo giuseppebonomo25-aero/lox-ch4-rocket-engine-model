@@ -1,6 +1,7 @@
 import pytest
 
 from src.performance import (
+    calculate_propellant_mass,
     calculate_total_mass_flow,
     check_mass_flow_balance,
     split_propellant_mass_flow,
@@ -61,4 +62,22 @@ def test_mass_flow_balance():
 
     )
 
+def test_propellant_mass():
+    total_flow = 29.132
+    burn_time = 10.0
 
+    propellant_mass = calculate_propellant_mass(
+        total_mass_flow=total_flow,
+        burn_time=burn_time,
+    )
+
+
+    assert propellant_mass == pytest.approx(291.32)
+
+
+def test_invalid_burn_time():
+    with pytest.raises(ValueError):
+        calculate_propellant_mass(
+            total_mass_flow=29.132,
+            burn_time=0.0,
+        )
