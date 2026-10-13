@@ -1,69 +1,105 @@
-# LOX/CH₄ Rocket Engine Model (Preliminary)
+# LOX/CH4 Propellant Consumption Baseline
 
-Preliminary Python model for LOX/CH₄ rocket engine propellant mass-flow analysis.
+This repository contains a small, reproducible baseline workflow for a LOX/CH4
+rocket-engine propellant-consumption model. It combines a Simulink model,
+MATLAB post-processing/export, and Python analysis and automated checks.
 
-## Features
+## Scope
 
-- Estimate total propellant mass flow from thrust and specific impulse.
-- Split mass flow between LOX and CH₄ as a function of oxidizer-to-fuel ratio.
-- Validate inputs and check mass-flow conservation.
-- Compute total propellant mass for a given burn time.
-- Generate parametric plots and CSV results.
-- Automated tests with pytest.
+The current baseline models constant LOX, CH4, and total propellant mass-flow
+rates that start at a configurable time. The Simulink integrators compute the
+cumulative propellant mass consumed during the simulation.
+
+This is an internal consistency baseline. It does **not** yet validate the
+model against experimental data or represent a detailed physical engine
+start-up/shutdown process.
+
+## Baseline case
+
+- Simulation duration: 10 s
+- Flow activation time: 1 s
+- Total propellant flow: 29.1347 kg/s
+- LOX flow: 22.6604 kg/s
+- CH4 flow: 6.4744 kg/s
+- Oxidizer-to-fuel ratio: 3.50
+- Final total mass consumed: 262.2127 kg
+
+## Repository layout
+
+```text
+models/                 Simulink model files
+scripts/                MATLAB and Python scripts
+src/                    Reusable Python source code
+tests/                  Automated Python tests
+results/                Exported data and generated figures
+```
 
 ## Requirements
 
-- Python 3.10+
-- NumPy
-- Matplotlib
-- pytest
+- MATLAB/Simulink installation used to run and export the baseline model
+- Python 3.10 or newer
+- Python packages listed in `requirements.txt`
 
-## Installation
+## Python setup
 
-```bash
+Create and activate a local virtual environment:
+
+```powershell
 python -m venv .venv
-.venv\Scripts\activate
-pip install -r requirements.txt
+.\.venv\Scripts\Activate.ps1
 ```
 
-## Usage
+Install the Python dependencies:
 
-```bash
-python -m pytest
-python -m src.plot_mass_flow
+```powershell
+python -m pip install -r requirements.txt
 ```
 
-Results are saved in the `results/` folder.
+## Run the analysis
 
-## Physics
+After running the Simulink baseline and exporting the results to
+`results/matlab_simulink/baseline_export.mat`, run:
 
-Total mass flow is estimated from:
+```powershell
+python .\scripts\python\analyze_simulink_baseline.py
+```
 
-\[
-\dot{m}_{tot} = \frac{F}{I_{sp} g_0}
-\]
+The script reads the exported MATLAB data, checks the propellant mass balance,
+and creates:
 
-where \(F\) is thrust, \(I_{sp}\) is specific impulse, and \(g_0\) is standard gravity.
+```text
+results/figures/propellant_mass_balance_python.png
+```
 
-LOX/CH₄ split depends on the mixture ratio \(O/F\):
+## Run the tests
 
-\[
-\dot{m}_{CH_4} = \frac{\dot{m}_{tot}}{1 + O/F}, \quad
-\dot{m}_{LOX} = \dot{m}_{tot} - \dot{m}_{CH_4}
-\]
+```powershell
+python -m pytest .\tests
+```
 
-Total propellant mass for a burn time \(t_b\):
+The mass-balance test verifies that, across the exported time series,
 
-\[
-m_{prop} = \dot{m}_{tot} t_b
-\]
+```text
+LOX mass + CH4 mass = total propellant mass
+```
 
-## Limitations
+within a numerical tolerance.
 
-- Specific impulse is an input, not computed from combustion or nozzle physics.
-- No chamber pressure, nozzle, or cooling model.
-- Intended as a preliminary performance model, not a complete engine design.
+## Results
 
-## License
+The baseline result is:
 
-MIT
+| Quantity | Value |
+|---|---:|
+| Final LOX mass | 203.9432 kg |
+| Final CH4 mass | 58.2695 kg |
+| Final total mass | 262.2127 kg |
+| Mass-balance error | 0.000000 kg |
+
+## Future work
+
+- Add a documented simulation workflow that runs the model from MATLAB.
+- Add independent references for validating engine-level assumptions.
+- Extend the baseline toward engine-cycle and vehicle-level dynamics.
+- Add CAD and structural-analysis cases only where they support a specific
+  engineering question.
