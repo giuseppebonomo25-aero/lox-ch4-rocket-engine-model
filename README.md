@@ -74,6 +74,25 @@ three Step blocks:
 
 This keeps the MATLAB configuration and Simulink baseline model consistent.
 
+## Startup ramp case
+
+The repository includes a 0.5 s startup ramp case in addition to the
+instantaneous step case.
+
+The propellant flow starts at 1 s, increases linearly until 1.5 s, and then
+remains at the nominal flow rate until the 10 s simulation stop time.
+
+| Case | Flow profile | Total propellant consumed |
+|---|---|---:|
+| Step | Instantaneous nominal flow at 1 s | 262.2127 kg |
+| Startup ramp | Linear ramp from 1 s to 1.5 s | 254.9291 kg |
+
+The MATLAB export script writes `results/matlab_simulink/ramp_export.mat`.
+The Python script `scripts/python/analyze_simulink_ramp.py` reads this file,
+checks the propellant mass balance, verifies the final mass against the
+analytical ramp result, and creates
+`results/figures/propellant_mass_ramp_python.png`.
+
 ## Run the analysis
 
 After running the Simulink baseline and exporting the results to
