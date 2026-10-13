@@ -55,6 +55,25 @@ Install the Python dependencies:
 python -m pip install -r requirements.txt
 ```
 
+## Simulink initialization
+
+The baseline Simulink model initializes its parameters through the `InitFcn`
+model callback. Before the model is updated or simulated, the callback runs:
+
+```matlab
+run("scripts/matlab/setup_simulation.m")
+```
+
+The setup script defines the engine inputs and derived variables used by the
+three Step blocks:
+
+- `start_time_s`
+- `total_flow_kg_s`
+- `lox_flow_kg_s`
+- `ch4_flow_kg_s`
+
+This keeps the MATLAB configuration and Simulink baseline model consistent.
+
 ## Run the analysis
 
 After running the Simulink baseline and exporting the results to

@@ -23,7 +23,7 @@ ch4_mass_kg = ch4_flow_kg_s * burn_duration_s;
 % Basic model checks 
 assert(thrust_N > 0, 'Thrust must be positive');
 assert(isp_s > 0, 'Specific impulse must be positive');
-assert(of_ratio > 0, 'O/F ratio must be potive');
+assert(of_ratio > 0, 'O/F ratio must be positive');
 assert(stop_time_s > start_time_s, ...
     'Stop time must be greater than startup time');
 
@@ -37,3 +37,5 @@ fprintf('Total propellant mass: %.3f kg\n', total_mass_kg);
 fprintf('LOX mass: %.3f kg\n', lox_mass_kg);
 fprintf('CH4 mass: %.3f kg\n', ch4_mass_kg);
 fprintf('Mass balance error: %.3e kg\n', mass_balance_error_kg);
+
+
