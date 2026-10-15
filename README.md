@@ -93,6 +93,33 @@ checks the propellant mass balance, verifies the final mass against the
 analytical ramp result, and creates
 `results/figures/propellant_mass_ramp_python.png`.
 
+## Automated verification
+
+The startup ramp export is verified automatically with pytest.
+
+After regenerating the MATLAB export with:
+
+```matlab
+run("scripts/matlab/export_ramp_case.m")
+```
+
+run the Python test suite from the repository root:
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+pytest
+```
+
+The ramp-case tests check that:
+
+- the exported MAT-file contains all required variables;
+- the time, LOX, CH4, and total-mass series have consistent lengths;
+- the consumed propellant masses increase monotonically;
+- LOX mass plus CH4 mass equals total propellant mass;
+- the final LOX, CH4, and total masses match the analytical ramp result;
+- the LOX/CH4 mixture ratio is 3.5;
+- the startup ramp duration is 0.5 s.
+
 ## Run the analysis
 
 After running the Simulink baseline and exporting the results to
