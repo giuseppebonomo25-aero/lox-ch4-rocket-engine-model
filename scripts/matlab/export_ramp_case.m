@@ -16,7 +16,15 @@ if ~bdIsLoaded(model)
     load_system(model);
 end
 
-out = sim(model);
+% Select the ramp profile explicitly for this simulation.
+sim_input = Simulink.SimulationInput(model);
+
+sim_input = setBlockParameter( ...
+    sim_input, ...
+    model + "/Profile selector", ...
+    "Value", "1");
+
+out = sim(sim_input);
 
 % Extract time and consumed-mass signals from To Workspace outputs.
 t = out.sim_total_mass.Time;

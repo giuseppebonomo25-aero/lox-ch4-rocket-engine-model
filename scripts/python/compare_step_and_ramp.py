@@ -10,7 +10,7 @@ project_root = Path(__file__).resolve().parents[2]
 results_dir = project_root / "results" / "matlab_simulink"
 figures_dir = project_root / "results" / "figures"
 
-step_file = results_dir / "baseline_export.mat"
+step_file = results_dir / "step_export.mat"
 ramp_file = results_dir / "ramp_export.mat"
 figure_file = figures_dir / "step_vs_ramp_mass_comparison.png"
 
