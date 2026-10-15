@@ -120,6 +120,41 @@ The ramp-case tests check that:
 - the LOX/CH4 mixture ratio is 3.5;
 - the startup ramp duration is 0.5 s.
 
+## Step vs startup ramp comparison
+
+Run the comparison script from the repository root:
+
+```powershell
+python scripts/python/compare_step_and_ramp.py
+```
+
+The script reads the historical Step export, `baseline_export.mat`,
+and the startup ramp export, `ramp_export.mat`, from
+`results/matlab_simulink/`.
+
+It checks the mass balance for both datasets, prints the final consumed
+propellant masses, and saves a comparison figure to:
+
+```text
+results/figures/step_vs_ramp_mass_comparison.png
+```
+
+| Consumed propellant | Step case | 0.5 s startup ramp |
+|---|---:|---:|
+| Total | 262.2127 kg | 254.9291 kg |
+| LOX | 203.9432 kg | 198.2782 kg |
+| CH4 | 58.2695 kg | 56.6509 kg |
+
+The total consumption difference is approximately 7.2837 kg,
+calculated from the unrounded exported values.
+
+Both cases start at 1 s and end at 10 s. The ramp case reaches the
+nominal flow rate at 1.5 s. Its lower consumption therefore reflects
+the reduced flow during startup, not improved propellant efficiency.
+
+The comparison script reads existing exports; it does not regenerate
+the MATLAB/Simulink simulations.
+
 ## Run the analysis
 
 After running the Simulink baseline and exporting the results to
