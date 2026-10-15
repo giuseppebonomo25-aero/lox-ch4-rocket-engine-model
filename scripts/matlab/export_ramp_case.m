@@ -1,7 +1,14 @@
-% Export the Simulink propellant-flow ramp case to a MAT-file.
+script_dir = fileparts(mfilename("fullpath"));
+project_root = fullfile(script_dir, "..", "..");
+model_dir = fullfile(project_root, "models", "simulink");
 
-% Run the model. Its InitFcn loads setup_simulation.m automatically.
-model_name = "propellant_consuption_baseline";
+addpath(model_dir);
+
+model = "propellant_consuption_baseline";
+
+if ~bdIsLoaded(model)
+    load_system(model);
+end
 out = sim(model_name);
 
 % Extract time and consumed-mass signals from To Workspace outputs.
