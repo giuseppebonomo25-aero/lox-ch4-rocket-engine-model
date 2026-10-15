@@ -1,7 +1,13 @@
+% Export the Simulink startup-ramp case to a MAT-file for Python analysis.
+%
+% The output path is resolved relative to this script, so the export is
+% written to <project_root>/results/matlab_simulink regardless of the
+% MATLAB current folder.
+
 script_dir = fileparts(mfilename("fullpath"));
 project_root = fullfile(script_dir, "..", "..");
-model_dir = fullfile(project_root, "models", "simulink");
 
+model_dir = fullfile(project_root, "models", "simulink");
 addpath(model_dir);
 
 model = "propellant_consuption_baseline";
@@ -9,7 +15,8 @@ model = "propellant_consuption_baseline";
 if ~bdIsLoaded(model)
     load_system(model);
 end
-out = sim(model_name);
+
+out = sim(model);
 
 % Extract time and consumed-mass signals from To Workspace outputs.
 t = out.sim_total_mass.Time;
@@ -26,12 +33,14 @@ ramp_duration_s = ramp_duration_s;
 stop_time_s = stop_time_s;
 
 % Save a portable analysis file in the project results directory.
-output_dir = fullfile("results", "matlab_simulink");
+output_dir = fullfile(project_root, "results", "matlab_simulink");
+
 if ~isfolder(output_dir)
     mkdir(output_dir);
 end
 
 output_file = fullfile(output_dir, "ramp_export.mat");
+
 save(output_file, ...
     "t", ...
     "total_mass_kg", ...
