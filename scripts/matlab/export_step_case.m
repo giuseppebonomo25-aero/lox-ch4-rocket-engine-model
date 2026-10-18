@@ -60,7 +60,7 @@ assert(all(abs(balance_error_kg(:)) ...
     "Step propellant mass balance failed.");
 
 % Save separately from the historical baseline export.
-profile_name = "step";
+profile_name = 'step';
 
 output_dir = fullfile(project_root, "results", "matlab_simulink");
 
