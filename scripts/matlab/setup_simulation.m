@@ -45,3 +45,15 @@ fprintf('LOX mass: %.3f kg\n', lox_mass_kg);
 fprintf('CH4 mass: %.3f kg\n', ch4_mass_kg);
 fprintf('Mass balance error: %.3e kg\n', mass_balance_error_kg);
 
+% Thrust and total-impulse reference values.
+% Assumption: constant specific impulse throughout the prescribed profile.
+effective_exhaust_velocity_m_s = isp_s * g0_m_s2;
+
+expected_step_impulse_N_s = thrust_N * burn_duration_s;
+expected_ramp_impulse_N_s = thrust_N * equivalent_full_flow_duration_s;
+
+fprintf('\n--- Thrust and impulse reference values ---\n');
+fprintf('Nominal thrust: %.1f N\n', thrust_N);
+fprintf('Effective exhaust velocity: %.3f m/s\n', effective_exhaust_velocity_m_s);
+fprintf('Expected Step total impulse: %.1f N*s\n', expected_step_impulse_N_s);
+fprintf('Expected ramp total impulse: %.1f N*s\n', expected_ramp_impulse_N_s);
