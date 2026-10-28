@@ -37,6 +37,7 @@ def load_case(case):
     data = loadmat(file_path, squeeze_me=True)
 
     required = [
+        "total_mass_kg",
         "thrust_time_s",
         "thrust_N_series",
         "impulse_time_s",
@@ -135,6 +136,7 @@ def main():
             )
             label = f"Ramp ({ramp_duration:g} s)"
 
+        # Check final impulse against the analytical profile reference.
         np.testing.assert_allclose(
             impulse[-1],
             expected_impulse,
@@ -142,6 +144,40 @@ def main():
             atol=1e-6,
             equal_nan=False,
             err_msg=f"{case}: final impulse differs from reference",
+        )
+
+        # Check final impulse against total consumed propellant.
+        consumed_mass_series = np.asarray(
+            data["total_mass_kg"], dtype=float
+        ).ravel()
+
+        assert consumed_mass_series.size > 0, (
+            f"{case}: consumed-mass series is empty"
+        )
+
+        consumed_mass_kg = float(consumed_mass_series[-1])
+        isp_s = float(data["isp_s"])
+        g0_m_s2 = float(data["g0_m_s2"])
+
+        assert np.isfinite(consumed_mass_kg) and consumed_mass_kg > 0, (
+            f"{case}: final consumed mass must be finite and positive"
+        )
+        assert isp_s > 0 and g0_m_s2 > 0, (
+            f"{case}: specific impulse and gravity must be positive"
+        )
+
+        impulse_from_mass_N_s = consumed_mass_kg * isp_s * g0_m_s2
+        equivalent_isp_s = float(impulse[-1]) / (
+            consumed_mass_kg * g0_m_s2
+        )
+
+        np.testing.assert_allclose(
+            float(impulse[-1]),
+            impulse_from_mass_N_s,
+            rtol=1e-8,
+            atol=1e-6,
+            equal_nan=False,
+            err_msg=f"{case}: impulse-mass consistency failed",
         )
 
         # Each signal is plotted against its own exported time axis.
@@ -160,6 +196,10 @@ def main():
         print(f"Maximum thrust: {np.max(thrust):.3f} N")
         print(f"Final impulse: {impulse[-1]:.3f} N s")
         print(f"Analytical reference: {expected_impulse:.3f} N s")
+        print(f"Consumed propellant: {consumed_mass_kg:.6f} kg")
+        print(f"Configured specific impulse: {isp_s:.6f} s")
+        print(f"Equivalent specific impulse: {equivalent_isp_s:.6f} s")
+        print("Impulse-mass consistency: PASS")
 
     difference = final_impulses["step"] - final_impulses["ramp"]
     print(f"\nStep minus ramp final impulse: {difference:.3f} N s")
@@ -186,6 +226,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-
