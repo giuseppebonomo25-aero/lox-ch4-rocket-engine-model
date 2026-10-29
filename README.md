@@ -25,8 +25,8 @@ This is a work-in-progress numerical project. It is not a complete or experiment
 | Isothermal-liquid restriction test bench using water | Implemented; initial operating-point check completed |
 | Preliminary LOX equivalent-injector sizing | Implemented |
 | Oxygen property calculations using CoolProp | Implemented |
-| LOX restriction test bench | Initial operating point simulated |
-| Updated LOX area verification | Pending confirmation |
+| LOX restriction test bench | Implemented; updated-area operating point simulated |
+| Updated LOX area verification | Initial consistency check completed at the displayed precision: 22.66 kg/s |
 | Coupled feed-system, chamber and nozzle model | Planned |
 
 ## Project scope
@@ -50,7 +50,8 @@ The current component work covers:
 - an initial restriction check using water properties;
 - preliminary LOX flow-area sizing in Python;
 - oxygen property evaluation at an assumed temperature of 90 K;
-- a LOX restriction test between prescribed upstream and downstream pressures.
+- a LOX restriction test between prescribed upstream and downstream pressures;
+- an initial operating-point consistency check using the updated LOX equivalent area.
 
 The component test benches are not yet coupled to a dynamic combustion chamber or nozzle.
 
@@ -617,13 +618,15 @@ models/simulink/lox_injector_test.slx
 | Stage | Density used for sizing | Equivalent area | Result |
 |---|---:|---:|---|
 | Initial sizing | Constant 1141 kg/m³ | 741.189 mm² | Simscape displayed approximately 22.79 kg/s |
-| Updated sizing | Mean operating density of approximately 1154.2 kg/m³ from the constant-bulk-modulus approximation | 736.940 mm² | Simulation confirmation pending |
+| Updated sizing | Mean operating density of approximately 1154.2 kg/m³ from the constant-bulk-modulus approximation | 736.940 mm² | Simscape displayed 22.66 kg/s, consistent with the target at the displayed precision |
 
 The initial result exceeded the target by approximately 0.57%, based on the rounded displayed flow.
 
 The area was updated to make the sizing assumptions more consistent with the Simscape fluid configuration. The discharge coefficient was not adjusted to force agreement.
 
-### Updated area
+### Updated area and operating-point result
+
+The updated area was entered in the Simscape orifice block:
 
 ```text
 Orifice area = 7.36940222e-4 m²
@@ -635,7 +638,24 @@ Equivalent circular diameter:
 30.632 mm
 ```
 
-Confirmation of the simulated flow with this area remains a pending verification item.
+The simulation produced the following displayed result:
+
+| Quantity | Value |
+|---|---:|
+| Python sizing target | 22.660360 kg/s |
+| Simscape displayed mass flow | 22.66 kg/s |
+| Upstream absolute pressure | 6 MPa |
+| Downstream absolute pressure | 5 MPa |
+| Assumed temperature | 90 K |
+| Discharge coefficient | 0.64 |
+
+The simulated mass flow agrees with the Python sizing target at the displayed precision.
+
+This completes the initial operating-point consistency check for the updated area. It does not establish exact numerical agreement beyond the displayed digits.
+
+A higher-precision numerical export is still needed to quantify the residual difference and support an automated tolerance-based check.
+
+This result is a numerical consistency check under the stated assumptions, not experimental validation of an injector.
 
 ## Running the component models
 
@@ -700,6 +720,7 @@ The current Step–ramp comparisons use `step_export.mat` and `ramp_export.mat`,
 - The downstream reservoir is not a dynamic combustion chamber.
 - No nozzle is coupled to the component test bench.
 - The 100 kN baseline target has not been demonstrated by a coupled physical engine model.
+- The updated LOX operating-point result has been checked at Display precision; a higher-precision numerical comparison is not yet documented.
 
 ### Verification and validation
 
@@ -725,14 +746,14 @@ For component changes:
 3. Calculate a preliminary reference or sizing result in Python.
 4. Configure and run the component model.
 5. Compare results using consistent assumptions.
-6. Record verification status before integration with other components.
+6. Record verification status and numerical precision before integration with other components.
 
 ## Roadmap
 
 ### Immediate next steps
 
-- Confirm the LOX operating-point flow with the updated equivalent area.
-- Record component results with sufficient numerical precision.
+- Export the updated LOX operating-point result with sufficient numerical precision.
+- Quantify the residual difference from the Python sizing target using a documented tolerance.
 - Add reproducible parameter initialization and result export for the component test benches.
 - Study sensitivity to pressure drop and discharge coefficient with fixed geometry.
 - Extend equivalent-injector modelling to the CH4 branch.
