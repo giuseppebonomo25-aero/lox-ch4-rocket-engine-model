@@ -21,8 +21,8 @@ Python scripts support preliminary area sizing and fluid-property calculations.
 | Oxygen-property calculations | Implemented using CoolProp 8.0.0 |
 | Updated-area LOX simulation | Displayed mass flow of 22.66 kg/s |
 | Initial LOX operating-point consistency check | Completed at displayed precision |
-| Higher-precision numerical export | Not yet implemented |
-| Automated component checks | Not yet implemented |
+| Higher-precision numerical export | Completed for the recorded nominal case |
+| Automated component checks | Implemented in a standalone Python analysis script; not yet in pytest |
 | Coupling to baseline or dynamic chamber | Not yet implemented |
 
 ## Files
@@ -268,21 +268,78 @@ The Python scripts do not automatically configure or run the models.
 
 ## Verification scope
 
-Completed:
+### Recorded nominal-case analysis
 
-- Initial water operating-point comparison at displayed precision.
-- Execution of oxygen-property and LOX-sizing scripts.
-- Initial updated-area LOX operating-point comparison at displayed precision.
+The LOX test-bench export was analysed using:
 
-Not yet implemented:
+```powershell
+python scripts/python/analyze_lox_injector.py
+```
 
-- Higher-precision exported component results.
-- Automated tolerance-based component checks.
-- Automated parameter transfer.
-- A documented multi-point verification campaign.
-- Experimental validation.
+The script checks:
 
-The baseline pytest suite does not verify these component models.
+- required exported variables and metadata labels;
+- matching time and flow array lengths;
+- finite values;
+- strictly increasing times;
+- the expected simulation interval;
+- non-negative flow within tolerance;
+- final-flow agreement with the rounded nominal target;
+- agreement of all recorded flow samples with the rounded nominal target.
+
+It also integrates the exported mass flow to calculate transported mass.
+
+### Recorded results
+
+| Quantity | Value |
+|---|---:|
+| Recorded samples | 51 |
+| Time interval | 0–1 s |
+| Rounded nominal target | 22.660360 kg/s |
+| Initial mass flow | 22.660360291 kg/s |
+| Final mass flow | 22.660360291 kg/s |
+| Recorded flow range | 0 kg/s |
+| Integrated transported mass | 22.660360291 kg |
+| Final-flow check | PASS |
+| All-sample nominal-flow check | PASS |
+
+The comparison uses a relative tolerance of `1e-4` and an absolute
+tolerance of `1e-6 kg/s`.
+
+These are working numerical-check tolerances, not physical accuracy
+claims or injector design requirements.
+
+All exported samples have the same flow value. This dataset therefore
+does not demonstrate a startup transient.
+
+The nominal target is rounded. Differences below its displayed precision
+should not be interpreted as a quantified physical modelling error.
+
+### Analysis outputs
+
+- `results/components/lox_injector_summary.csv`
+- `results/figures/lox_injector_mass_flow.png`
+
+![LOX nominal operating-point analysis](../../results/figures/lox_injector_mass_flow.png)
+
+### Boundaries
+
+The checks apply to the saved dataset.
+
+They do not automatically verify the model's block parameters, establish
+that the export came from the latest model revision, or provide
+experimental validation.
+
+Transported mass is obtained by integrating flow through the restriction.
+It is not combusted propellant mass or an independent network-wide
+mass-conservation check.
+
+The analysis is implemented in a standalone Python script, not yet in
+the pytest suite.
+
+Higher-precision component data have now been exported and analysed.
+Automated simulation/export and a documented multi-point verification
+campaign remain future work.
 
 ## Limitations
 
@@ -308,11 +365,11 @@ The two models remain separate. The restriction does not yet supply a time-depen
 
 ## Next steps
 
-- Export LOX flow with sufficient numerical precision.
-- Define a comparison tolerance and quantify the residual difference.
-- Add reproducible component parameter initialization.
-- Automate result export and checks.
-- Investigate pressure-drop and discharge-coefficient sensitivity.
+- Export the sizing reference at full precision with its assumptions.
+- Automate simulation and component-data export.
+- Read relevant model parameters into the export rather than relying on manual labels.
+- Add component checks to the pytest suite.
+- Investigate pressure-drop sensitivity with fixed geometry.
 - Extend the equivalent-restriction approach to the CH4 branch.
 - Define the scope and interfaces for future coupling.
 
